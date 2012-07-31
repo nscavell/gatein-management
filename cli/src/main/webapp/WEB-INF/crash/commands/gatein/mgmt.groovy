@@ -160,6 +160,50 @@ Executes the read-resource operation of the current address (path) passing in at
     def before = address;
     def addr = getAddress(address, path);
 
+	def actualFile;
+	if(operation.equals(OperationNames.EXPORT_RESOURCE))
+	{
+		if(file == null)
+		{
+			return "File option is mandatory for " + OperationNames.EXPORT_RESOURCE + " operation.";
+		}
+	
+		if(contentType == null)
+		{
+			ct = ContentType.ZIP;
+		}
+		else if(!contentType.equals(ContentType.ZIP))
+		{
+			return "Only " + ContentType.ZIP + " content type is supported for " + OperationNames.EXPORT_RESOURCE + " operation.";
+		}
+	
+		actualFile = new File(file);
+	
+	    if (actualFile.isDirectory())
+	    {
+	      if (!actualFile.exists()) return "Directory " + actualFile + " does not exist.";
+	      String filename = addr.lastElement;
+	      if (filename.endsWith(".zip")) filename = filename.substring(0, filename.lastIndexOf(".zip"));
+	      filename = filename + "_" + SDF.format(new Date()) + ".zip";
+	      actualFile = new File(filename, actualFile);
+	    }
+	    else
+	    {
+	      if (!actualFile.getParentFile().exists()) return "Directory " + actualFile.getParentFile() + " does not exist.";
+	      if (actualFile.exists()) return "File $actualFile already exists.";
+	    }	
+	}
+	else
+	{
+	    InputStream inputStream = null;
+	    if (file != null)
+	    {
+	      actualFile = new File(file);
+	      if (!actualFile.exists()) return "File $actualFile does not exist.";
+	      inputStream = new FileInputStream(actualFile);
+	    }
+	}
+
     execute(operation, addr, ct, parseAttributes(attributes),  inputStream, { result ->
       address = before;
       def resp = response as ManagedResponse;
