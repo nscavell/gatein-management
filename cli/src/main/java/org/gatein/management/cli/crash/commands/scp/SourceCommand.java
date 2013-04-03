@@ -22,6 +22,7 @@
 
 package org.gatein.management.cli.crash.commands.scp;
 
+import org.crsh.plugin.PluginContext;
 import org.crsh.ssh.term.scp.SCPAction;
 import org.crsh.util.IO;
 import org.gatein.management.api.ContentType;
@@ -42,9 +43,9 @@ import java.util.Map;
  */
 public class SourceCommand extends SCPCommand
 {
-   protected SourceCommand(SCPAction action)
+   protected SourceCommand(SCPAction action, PluginContext context)
    {
-      super(action);
+      super(action, context);
    }
 
    @Override

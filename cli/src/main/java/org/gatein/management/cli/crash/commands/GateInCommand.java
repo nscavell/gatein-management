@@ -22,7 +22,6 @@
 
 package org.gatein.management.cli.crash.commands;
 
-import org.crsh.cmdline.IntrospectionException;
 import org.crsh.command.CRaSHCommand;
 import org.crsh.command.ScriptException;
 import org.gatein.common.logging.Logger;
@@ -40,10 +39,6 @@ public class GateInCommand extends CRaSHCommand
    private static final Logger log = LoggerFactory.getLogger(GateInCommand.class);
 
    private Object conversationState;
-
-   protected GateInCommand() throws IntrospectionException
-   {
-   }
 
    protected <T> T getComponent(String containerName, Class<T> componentClass) throws ScriptException
    {

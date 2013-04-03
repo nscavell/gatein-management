@@ -20,12 +20,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import org.crsh.command.DescriptionMode
-import org.crsh.command.CRaSHCommand
-import org.crsh.cmdline.annotations.Usage
-import org.crsh.cmdline.annotations.Command;
+import org.crsh.command.DescriptionFormat
+import org.crsh.cli.Usage
+import org.crsh.cli.Command
+import org.crsh.text.ui.UIBuilder
 
-class help extends CRaSHCommand
+class help
 {
 
   /** . */
@@ -37,31 +37,37 @@ class help extends CRaSHCommand
     def names = [];
     def descs = [];
     int len = 0;
-    shellContext.listResourceId(org.crsh.plugin.ResourceKind.SCRIPT).each() {
+    crash.context.listResourceId(org.crsh.plugin.ResourceKind.COMMAND).each() {
       String name ->
       try {
-        def cmd = shell.getCommand(name);
+        def cmd = crash.getCommand(name);
         if (cmd != null) {
-          def desc = cmd.describe(name, DescriptionMode.DESCRIBE) ?: "";
+          def desc = cmd.describe(name, DescriptionFormat.DESCRIBE) ?: "";
           names.add(name);
           descs.add(desc);
           len = Math.max(len, name.length());
         }
-      } catch (org.crsh.shell.impl.CreateCommandException ignore) {
-        //
+      } catch (Exception ignore) {
+        throw new org.crsh.command.ScriptException(ignore);
       }
     }
+    
+    def builder = new UIBuilder()
 
     //
-    def ret = "Try one of these commands with the -h or --help switch:\n\n";
-    for (int i = 0;i < names.size();i++) {
-      def name = names[i];
-      char[] chars = new char[TAB.length() + len - name.length()];
-      Arrays.fill(chars, (char)' ');
-      def space = new String(chars);
-      ret += "$TAB$name$space${descs[i]}\n";
+    builder.label("Try one of these commands with the -h or --help switch:\n");
+
+    builder.table(rightCellPadding: 1) {
+      row(bold: true, fg: black, bg: white) {
+        label("NAME"); label("DESCRIPTION")
+      }
+      for (int i = 0;i < names.size();i++) {
+        row() {
+            label(foreground: red, names[i]); label(descs[i])
+        }
+      }
     }
-    ret += "\n";
-    return ret;
+    
+    return builder;
   }
 }

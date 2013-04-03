@@ -23,11 +23,11 @@
 package org.gatein.management.cli.crash.commands.scp;
 
 import org.apache.sshd.server.Command;
-import org.crsh.cmdline.ClassDescriptor;
-import org.crsh.cmdline.CommandFactory;
-import org.crsh.cmdline.matcher.CommandMatch;
-import org.crsh.cmdline.matcher.InvocationContext;
-import org.crsh.cmdline.matcher.Matcher;
+import org.crsh.cli.impl.descriptor.CommandDescriptorImpl;
+import org.crsh.cli.impl.invocation.InvocationMatch;
+import org.crsh.cli.impl.invocation.InvocationMatcher;
+import org.crsh.cli.impl.invocation.Resolver;
+import org.crsh.cli.impl.lang.CommandFactory;
 import org.crsh.ssh.term.FailCommand;
 import org.crsh.ssh.term.scp.CommandPlugin;
 import org.crsh.ssh.term.scp.SCPAction;
@@ -48,11 +48,11 @@ public class SCPCommandPlugin extends CommandPlugin
 
          if (Boolean.TRUE.equals(action.isSource()))
          {
-            return new SourceCommand(action);
+            return new SourceCommand(action, getContext());
          }
          else if (Boolean.TRUE.equals(action.isSink()))
          {
-            return new SinkCommand(action);
+            return new SinkCommand(action, getContext());
          }
       }
 
@@ -64,10 +64,10 @@ public class SCPCommandPlugin extends CommandPlugin
       try
       {
          SCPAction action = new SCPAction();
-         ClassDescriptor<SCPAction> descriptor = CommandFactory.create(SCPAction.class);
-         Matcher<SCPAction> analyzer = Matcher.createMatcher("main", descriptor);
-         CommandMatch<SCPAction, ?, ?> match = analyzer.match(command);
-         match.invoke(new InvocationContext(), action);
+         CommandDescriptorImpl<SCPAction> descriptor = CommandFactory.DEFAULT.create(SCPAction.class);
+         InvocationMatcher<SCPAction> analyzer = descriptor.invoker("main");
+         InvocationMatch<SCPAction> match = analyzer.match(command);
+         match.invoke(Resolver.EMPTY, action);
 
          return action;
       }

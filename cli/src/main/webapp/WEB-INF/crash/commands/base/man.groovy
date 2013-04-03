@@ -20,20 +20,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import org.crsh.command.DescriptionMode
-import org.crsh.command.CRaSHCommand
-import org.crsh.cmdline.annotations.Usage
-import org.crsh.cmdline.annotations.Command
-import org.crsh.cmdline.annotations.Argument
-import org.crsh.command.ScriptException;
+import org.crsh.cli.Required
+import org.crsh.command.DescriptionFormat
+import org.crsh.cli.Usage
+import org.crsh.cli.Command
+import org.crsh.cli.Argument;
 
-class man extends CRaSHCommand {
+class man {
   @Usage("format and display the on-line manual pages")
   @Command
-  Object main(@Usage("the command") @Argument String command) throws ScriptException {
-    def cmd = shell.getCommand(command);
+  Object main(@Usage("the command") @Argument @Required String command) {
+    def cmd = crash.getCommand(command);
     if (cmd != null) {
-      return  cmd.describe(unmatched, DescriptionMode.MAN);
+      return  cmd.describe(unmatched, DescriptionFormat.MAN);
     } else {
       return "Command $command not found";
     }

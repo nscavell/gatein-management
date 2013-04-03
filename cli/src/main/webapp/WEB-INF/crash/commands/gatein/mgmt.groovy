@@ -20,12 +20,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-
-import org.crsh.cmdline.annotations.Argument
-import org.crsh.cmdline.annotations.Command
-import org.crsh.cmdline.annotations.Man
-import org.crsh.cmdline.annotations.Required
-import org.crsh.cmdline.annotations.Usage
+import org.crsh.cli.Argument
+import org.crsh.cli.Command
+import org.crsh.cli.Man
+import org.crsh.cli.Required
+import org.crsh.cli.Usage
 import org.crsh.command.InvocationContext
 import org.crsh.command.ScriptException
 import org.gatein.common.logging.LoggerFactory
@@ -42,9 +41,11 @@ import org.gatein.management.cli.crash.arguments.Input
 import org.gatein.management.cli.crash.arguments.OperationOption
 import org.gatein.management.cli.crash.arguments.Output
 import org.gatein.management.cli.crash.arguments.Password
+import org.gatein.management.cli.crash.arguments.Path
+import org.gatein.management.cli.crash.arguments.PathArgument
 import org.gatein.management.cli.crash.arguments.UserName
 import org.gatein.management.cli.crash.commands.ManagementCommand
-import org.gatein.management.cli.crash.plugins.JaasAuthenticationPlugin
+import org.gatein.management.cli.crash.commands.scp.JaasAuthenticator
 
 @Usage("gatein management commands")
 class mgmt extends ManagementCommand
@@ -62,7 +63,7 @@ Connect to portal container 'sample-portal'
 
 """)
   @Command
-  public Object connect(@UserName String userName, @Password String password, @Container String containerName, InvocationContext<Void, Void> ctx) throws ScriptException
+  public Object connect(@UserName String userName, @Password String password, @Container String containerName, InvocationContext<Void> ctx) throws ScriptException
   {
     if (userName != null && userName.trim().length() == 0) {
       return "User name cannot be empty"
@@ -95,7 +96,7 @@ Connect to portal container 'sample-portal'
         if (password == null) {
           password = readLine("Password for $userName: ", false);
         }
-        auth = JaasAuthenticationPlugin.login(userName, password, jaasDomain);
+        auth = JaasAuthenticator.login(userName, password, jaasDomain);
 
         if (!auth) {
           password = null;
@@ -153,7 +154,7 @@ Executes the read-resource operation of the current address (path) passing in at
 
 """)
   @Command
-  public Object exec(@ContentTypeOption String contentType, @Input String input, @Output String output, @AttributeOption List<String> attributes, @Required @OperationOption String operation, @Argument String path)
+  public Object exec(@ContentTypeOption String contentType, @Input String input, @Output String output, @AttributeOption List<String> attributes, @Required @OperationOption String operation, @PathArgument Path path)
   {
     assertConnected()
     def ct = (contentType == null) ? ContentType.JSON : ContentType.forName(contentType);

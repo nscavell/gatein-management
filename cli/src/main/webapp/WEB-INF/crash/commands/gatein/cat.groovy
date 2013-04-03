@@ -20,15 +20,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import org.crsh.cmdline.annotations.Argument
-import org.crsh.cmdline.annotations.Command
-import org.crsh.cmdline.annotations.Man
-import org.crsh.cmdline.annotations.Usage
+import org.crsh.cli.Argument
+import org.crsh.cli.Command
+import org.crsh.cli.Man
+import org.crsh.cli.Usage
 import org.crsh.command.ScriptException
 import org.gatein.management.api.ContentType
+import org.gatein.management.api.PathAddress
 import org.gatein.management.api.controller.ManagedResponse
 import org.gatein.management.api.operation.OperationNames
 import org.gatein.management.cli.crash.arguments.ContentTypeOption
+import org.gatein.management.cli.crash.arguments.Path
+import org.gatein.management.cli.crash.arguments.PathArgument
 import org.gatein.management.cli.crash.commands.ManagementCommand
 
 class cat extends ManagementCommand
@@ -38,7 +41,7 @@ class cat extends ManagementCommand
 The cat command invokes the 'read-config' operation on the given resource.
 """)
   @Command
-  public Object main(@ContentTypeOption ContentType ct,  @Argument String path) throws ScriptException
+  public Object main(@ContentTypeOption ContentType ct,  @PathArgument Path path) throws ScriptException
   {
     assertConnected()
 

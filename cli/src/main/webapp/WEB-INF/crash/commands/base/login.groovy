@@ -38,11 +38,12 @@ welcome = { ->
  .~      ~. |`````````,       .'.                   ..'''' |         |
 |           |'''|'''''      .''```.              .''       |_________|
 |           |    `.       .'       `.         ..'          |         |
- `.______.' |      `.   .'           `. ....''             |         | ${shellContext.version}
+ `.______.' |      `.   .'           `. ....''             |         | ${crash.context.version}
 
-Follow and support the project on http://crsh.googlecode.com
+Follow and support the project on http://www.crashub.org
 GateIn Management CLI running @ $hostName
-It is ${new Date()} now""";
+It is ${new Date()} now
+""";
 }
 
 prompt = { ->

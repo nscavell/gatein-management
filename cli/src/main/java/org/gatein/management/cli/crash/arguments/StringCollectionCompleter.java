@@ -22,13 +22,11 @@
 
 package org.gatein.management.cli.crash.arguments;
 
-import org.crsh.cmdline.ParameterDescriptor;
-import org.crsh.cmdline.spi.Completer;
+import org.crsh.cli.descriptor.ParameterDescriptor;
+import org.crsh.cli.spi.Completer;
+import org.crsh.cli.spi.Completion;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
@@ -43,18 +41,21 @@ public class StringCollectionCompleter implements Completer
    }
 
    @Override
-   public Map<String, Boolean> complete(ParameterDescriptor<?> parameter, String prefix) throws Exception
+   public Completion complete(ParameterDescriptor parameter, String prefix) throws Exception
    {
-      Map<String, Boolean> completions = Collections.emptyMap();
-      for (String value : collection) {
-         if (value.startsWith(prefix)) {
-            if (completions.isEmpty()) {
-               completions = new LinkedHashMap<String, Boolean>();
+      Completion.Builder completions = null;
+      for (String value : collection)
+      {
+         if (value.startsWith(prefix))
+         {
+            if (completions == null)
+            {
+               completions = Completion.builder(prefix);
             }
-            completions.put(value.substring(prefix.length()), true);
+            completions.add(value.substring(prefix.length()), true);
          }
       }
 
-      return completions;
+      return (completions == null) ? Completion.create() : completions.build();
    }
 }

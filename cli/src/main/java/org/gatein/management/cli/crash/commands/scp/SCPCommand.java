@@ -24,8 +24,9 @@ package org.gatein.management.cli.crash.commands.scp;
 
 import org.apache.sshd.common.SshConstants;
 import org.apache.sshd.server.Environment;
-import org.crsh.cmdline.IntrospectionException;
+import org.crsh.auth.JaasAuthenticationPlugin;
 import org.crsh.command.ScriptException;
+import org.crsh.plugin.PluginContext;
 import org.crsh.ssh.term.AbstractCommand;
 import org.crsh.ssh.term.SSHLifeCycle;
 import org.crsh.ssh.term.scp.SCPAction;
@@ -33,10 +34,7 @@ import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 import org.gatein.management.api.controller.ManagementController;
 import org.gatein.management.cli.crash.commands.ManagementCommand;
-import org.gatein.management.cli.crash.plugins.CustomWebPluginLifecycle;
-import org.gatein.management.cli.crash.plugins.JaasAuthenticationPlugin;
 
-import javax.jcr.Session;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,29 +54,21 @@ public abstract class SCPCommand extends AbstractCommand implements Runnable
 
    private String path;
    private String containerName;
-   private String jaasDomain;
 
    private SCPManagementCommand scpManagementCommand;
    private Thread thread;
+   private PluginContext context;
 
-   protected SCPCommand(SCPAction action)
+   protected SCPCommand(SCPAction action, PluginContext context)
    {
       parseSCPAction(action);
+      this.context = context;
    }
 
    @Override
    public void start(Environment environment) throws IOException
    {
-      try
-      {
-         scpManagementCommand = new SCPManagementCommand();
-         jaasDomain = CustomWebPluginLifecycle.getCrashProperties().getProperty("crash.jaas.domain", "gatein-domain");
-      }
-      catch (IntrospectionException e)
-      {
-         throw new RuntimeException(e);
-      }
-
+      scpManagementCommand = new SCPManagementCommand();
       thread = new Thread(this, "CRaSH");
       thread.start();
    }
@@ -117,8 +107,8 @@ public abstract class SCPCommand extends AbstractCommand implements Runnable
 
       // Log in
       log.debug("Attempting to authenticate user " + userName);
-      JaasAuthenticationPlugin jaas = new JaasAuthenticationPlugin();
-      boolean authenticated = jaas.login(userName, password, jaasDomain);
+      JaasAuthenticationPlugin plugin = context.getPlugin(JaasAuthenticationPlugin.class);
+      boolean authenticated = plugin.authenticate(userName, password);
 
       if (!authenticated)
       {
@@ -244,11 +234,6 @@ public abstract class SCPCommand extends AbstractCommand implements Runnable
 
    private static class SCPManagementCommand extends ManagementCommand
    {
-      protected SCPManagementCommand() throws IntrospectionException
-      {
-         super();
-      }
-
       @Override
       protected void start(String userName, String containerName)
       {

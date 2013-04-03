@@ -22,17 +22,16 @@
 
 package org.gatein.management.cli.crash.arguments;
 
-import org.crsh.cmdline.EnumCompleter;
-import org.crsh.cmdline.ParameterDescriptor;
-import org.crsh.cmdline.annotations.Man;
-import org.crsh.cmdline.annotations.Option;
-import org.crsh.cmdline.annotations.Usage;
+import org.crsh.cli.Man;
+import org.crsh.cli.Option;
+import org.crsh.cli.Usage;
+import org.crsh.cli.descriptor.ParameterDescriptor;
+import org.crsh.cli.spi.Completer;
+import org.crsh.cli.spi.Completion;
 import org.gatein.management.api.ContentType;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
@@ -44,23 +43,28 @@ import java.util.Map;
 @Man("The content type of an operation")
 public @interface ContentTypeOption
 {
-   public static class ContentTypeCompleter extends EnumCompleter
+   public static class ContentTypeCompleter implements Completer
    {
       @Override
-      public Map<String, Boolean> complete(ParameterDescriptor<?> parameter, String prefix) throws Exception
+      public Completion complete(ParameterDescriptor parameter, String prefix) throws Exception
       {
          ContentType[] cts = ContentType.values();
-         Map<String, Boolean> completions = new HashMap<String, Boolean>(cts.length);
+         //Map<String, Boolean> completions = new HashMap<String, Boolean>(cts.length);
+         Completion.Builder completions = null;
          for (ContentType ct : cts)
          {
             String value = ct.getName();
             if (value.startsWith(prefix))
             {
-               completions.put(value.substring(prefix.length()), true);
+               if (completions == null)
+               {
+                  completions = Completion.builder(prefix);
+               }
+               completions.add(value.substring(prefix.length()), true);
             }
          }
 
-         return completions;
+         return (completions == null) ? Completion.create() : completions.build();
       }
    }
 }

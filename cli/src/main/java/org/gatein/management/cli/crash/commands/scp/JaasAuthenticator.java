@@ -20,11 +20,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.gatein.management.cli.crash.plugins;
+package org.gatein.management.cli.crash.commands.scp;
 
-import org.crsh.plugin.CRaSHPlugin;
-import org.crsh.plugin.PropertyDescriptor;
-import org.crsh.ssh.AuthenticationPlugin;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
 
@@ -37,53 +34,22 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author <a href="mailto:nscavell@redhat.com">Nick Scavelli</a>
  * @version $Revision$
  */
-public class JaasAuthenticationPlugin extends CRaSHPlugin<AuthenticationPlugin> implements AuthenticationPlugin
+public class JaasAuthenticator
 {
    private static final Logger log = LoggerFactory.getLogger("org.gatein.management.cli");
 
-   static final PropertyDescriptor<String> JAAS_DOMAIN = new PropertyDescriptor<String>(String.class, "jaas.domain", null, "The GateIn JAAS domain name used to authenticate the CLI.")
-   {
-      @Override
-      protected String doParse(String s)
-      {
-         return s;
-      }
-   };
-
-   @Override
-   public AuthenticationPlugin getImplementation()
-   {
-      return this;
-   }
-
-   @Override
-   protected Iterable<PropertyDescriptor<?>> createConfigurationCapabilities()
-   {
-      List<PropertyDescriptor<?>> list = new ArrayList<PropertyDescriptor<?>>(1);
-      list.add(JAAS_DOMAIN);
-
-      return list;
-   }
-
-   @Override
-   public boolean authenticate(final String username, final String password) throws Exception
-   {
-      String domain = getContext().getProperty(JAAS_DOMAIN);
-      return login(username, password, domain);
-   }
+   public static final String JAAS_DOMAIN_PROPERTY = "crash.auth.jaas.domain";
 
    public static boolean login(final String username, final String password, final String domain) throws LoginException
    {
       if (domain != null)
       {
-         log.debug("Will use the JAAS domain '" + domain + "' for authenticating user " + username +" into CRaSH.");
+         log.debug("Will use the JAAS domain '" + domain + "' for authenticating user " + username + " into CRaSH.");
          LoginContext loginContext = new LoginContext(domain, new Subject(), new CallbackHandler()
          {
             @Override
@@ -121,7 +87,7 @@ public class JaasAuthenticationPlugin extends CRaSHPlugin<AuthenticationPlugin> 
       }
       else
       {
-         log.warn("The JAAS domain property '" + JAAS_DOMAIN.name + "' was not found. JAAS authentication disabled.");
+         log.warn("The JAAS domain property '" + JAAS_DOMAIN_PROPERTY + "' was not found. JAAS authentication disabled.");
          return true;
       }
    }

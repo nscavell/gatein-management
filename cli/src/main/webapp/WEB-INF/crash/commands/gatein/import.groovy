@@ -20,17 +20,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-import org.crsh.cmdline.annotations.Argument
-import org.crsh.cmdline.annotations.Command
-import org.crsh.cmdline.annotations.Man
-import org.crsh.cmdline.annotations.Required
-import org.crsh.cmdline.annotations.Usage
+import org.crsh.cli.Argument
+import org.crsh.cli.Command
+import org.crsh.cli.Man
+import org.crsh.cli.Required
+import org.crsh.cli.Usage
 import org.gatein.management.api.ContentType
 import org.gatein.management.api.controller.ManagedResponse
 import org.gatein.management.api.operation.OperationNames
 import org.gatein.management.cli.crash.arguments.FileOption
 import org.gatein.management.cli.crash.arguments.ImportModeOption
 import org.gatein.management.cli.crash.arguments.ImportModeOption.ImportModeCompleter
+import org.gatein.management.cli.crash.arguments.Path
+import org.gatein.management.cli.crash.arguments.PathArgument
 import org.gatein.management.cli.crash.commands.ManagementCommand
 
 import java.text.SimpleDateFormat
@@ -45,7 +47,7 @@ class importfile extends ManagementCommand
 The import command invokes the 'import-resource' operation on the given resource.
 """)
   @Command
-  public Object main(@Required @FileOption String file, @ImportModeOption String importMode, @Argument String path) throws ScriptException
+  public Object main(@Required @FileOption String file, @ImportModeOption String importMode, @PathArgument Path path) throws ScriptException
   {
     assertConnected()
     def actualFile = new File(file);

@@ -22,6 +22,7 @@
 
 package org.gatein.management.cli.crash.commands.scp;
 
+import org.crsh.plugin.PluginContext;
 import org.crsh.ssh.term.scp.SCPAction;
 import org.gatein.common.logging.Logger;
 import org.gatein.common.logging.LoggerFactory;
@@ -44,9 +45,9 @@ public class SinkCommand extends SCPCommand
 {
    private static final Logger log = LoggerFactory.getLogger(SinkCommand.class);
 
-   protected SinkCommand(SCPAction action)
+   protected SinkCommand(SCPAction action, PluginContext context)
    {
-      super(action);
+      super(action, context);
    }
 
    @Override
